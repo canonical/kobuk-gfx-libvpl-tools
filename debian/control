@@ -2,13 +2,14 @@ Source: libvpl-tools
 Section: graphics
 Priority: optional
 Maintainer: Shane McKee <shane.mckee@canonical.com>
+XSBC-Original-Maintainer: Intel Graphics Team <linux-graphics@intel.com>
 Build-Depends: debhelper-compat (= 13),
  build-essential,
  cmake,
  libdrm-dev,
  libpciaccess-dev,
- libva-dev (>= 2.17),
- libvpl-dev (>= 2.11.0),
+ libva-dev (>= 2.22),
+ libvpl-dev (>= 2.14.0),
  libwayland-dev,
  libx11-dev,
  libx11-xcb-dev,
@@ -25,7 +26,7 @@ Rules-Requires-Root: no
 Package: libvpl-tools
 Architecture: amd64
 Depends:
- libvpl2 (>= 2.11.0),
+ libvpl2 (>= 2.14.0),
  ${shlibs:Depends}, ${misc:Depends}
 Description: Intel oneVPL GPU Runtime -- shared library
  Intel® Video Processing Library (Intel® VPL) tools provide access to hardware
