@@ -76,7 +76,7 @@ jobs:
       - name: Move artifacts to target directory
         run: |
             mv artifacts/* source/.github/workflows/sdl/
-            ls -al source/.github/workflows/sdl/sdl
+            ls -al source/.github/workflows/sdl/sdl/tools
 
       - name: Build Docker image
         run: >
@@ -92,7 +92,7 @@ jobs:
           #!/bin/bash
           ls source/.github/workflows/sdl
 
-          FILE_PATH="source/.github/workflows/sdl/sdl"
+          FILE_PATH="source/.github/workflows/sdl/sdl/tools"
           function publish() {
             TASK="$1"
             EVIDENCE="$2"
@@ -107,6 +107,8 @@ jobs:
           }
 
           publish CT7 CT7-KnownVulnerabilities/vulns.csv
+          publish CT7 CT7-KnownVulnerabilities/results.pdf
+          publish CT36 CT36-RegisterComponents/components.csv
           publish CT37 CT37-MalwareScan/source-report.txt
           publish CT37 CT37-MalwareScan/windows-report.txt
           publish CT39 CT39-StaticAnalysis/linux-coverity.json
@@ -115,9 +117,10 @@ jobs:
           publish CT39 CT39-StaticAnalysis/windows-coverity.json
           publish CT39 CT39-StaticAnalysis/windows-cvss_report.pdf
           publish CT39 CT39-StaticAnalysis/windows-security_report.pdf
+          publish CT40 CT40-SecurityValidation/linux.csv
+          publish CT40 CT40-SecurityValidation/windows.csv
           publish CT151 CT151-CompilerFlags/SSCB_SCAN_results-Windows.html
           publish CT151 CT151-CompilerFlags/SSCB_SCAN_results-Linux.html
-          publish CT248 CT248-DockerScan/ct248-report.json
           publish CT247 CT247-Trivy/trivy-report.csv
 
           EOL

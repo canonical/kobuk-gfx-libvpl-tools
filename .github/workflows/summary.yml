@@ -61,7 +61,7 @@ jobs:
           . source/.github/workflows/summary/tools.sh
 
           export source_root=artifacts
-          export dest_root=summary/bom
+          export dest_root=summary/bom/tools
 
           copy_all_artifacts "$DIFF_L" Linux
           copy_all_artifacts "$DIFF_W" Windows
@@ -73,9 +73,11 @@ jobs:
           . source/.github/workflows/summary/tools.sh
 
           export source_root=artifacts
-          export dest_root=summary/sdl
+          export dest_root=summary/sdl/tools
 
           copy_artifact "$BDBA" vulns.csv CT7-KnownVulnerabilities
+          copy_artifact "$BDBA" results.pdf CT7-KnownVulnerabilities
+          copy_artifact "$BDBA" components.csv CT36-RegisterComponents
           copy_artifact "$AV_S" report.txt CT37-MalwareScan source-report.txt
           copy_artifact "$AV_L" report.txt CT37-MalwareScan linux-report.txt
           copy_artifact "$AV_W" report.txt CT37-MalwareScan windows-report.txt
@@ -91,7 +93,6 @@ jobs:
                         CT39-StaticAnalysis windows-cvss_report.pdf
           copy_artifact "$COVERITY_W" security_report.pdf \
                         CT39-StaticAnalysis windows-security_report.pdf
-          copy_artifact "$TRIVY" ct248-report.json CT248-DockerScan
           copy_artifact "$TRIVY" trivy-report.csv CT247-Trivy
           copy_all_artifacts $SSCB_L CT151-CompilerFlags
           copy_all_artifacts $SSCB_W CT151-CompilerFlags
@@ -101,7 +102,7 @@ jobs:
           . source/.github/workflows/summary/tools.sh
 
           export source_root=artifacts
-          export dest_root=summary/swlc
+          export dest_root=summary/swlc/tools
 
           copy_all_artifacts "$IPLEAKS" ip_leaks
 
@@ -114,8 +115,8 @@ jobs:
           export source_root=artifacts
           export dest_root=summary/quality
 
-          copy_glob_artifact "$UTEST_L/*/Test.xml" unit linux.xml
-          copy_glob_artifact "$UTEST_W/*/Test.xml" unit windows.xml
+          copy_artifact "$UTEST_L" linux.xml unit/tools linux.xml
+          copy_artifact "$UTEST_W" windows.xml unit/tools windows.xml
           copy_all_artifacts "$U2204" acceptance/Ubuntu22.04/gen12.5
           copy_all_artifacts "$WIN11" acceptance/Win11/gen12.5
           copy_all_artifacts "$SLES154" acceptance/SLES15.4/gen12.5
@@ -141,6 +142,29 @@ jobs:
             python3 \
             "/tmp/work/source/.github/workflows/summary/summarize_testing.py" \
             /tmp/work/summary/quality
+          fi
+
+      - name: Report security related tests
+        run: |
+          if [ -d summary/quality/unit/tools ]
+          then
+            mkdir -p -v summary/sdl/tools/CT40-SecurityValidation
+            docker run --rm -v $(pwd):/tmp/work -w /tmp/work  \
+            vpl_summary:ubuntu \
+            python3 \
+            "/tmp/work/source/.github/workflows/summary/filter_xunit.py" \
+            "/tmp/work/summary/quality/unit/tools/linux.xml" \
+            -o "/tmp/work/summary/sdl/tools/CT40-SecurityValidation/linux.csv" \
+            -i Double Null Unsupported Invalid
+
+            docker run --rm -v $(pwd):/tmp/work -w /tmp/work  \
+            vpl_summary:ubuntu \
+            python3 \
+            "/tmp/work/source/.github/workflows/summary/filter_xunit.py" \
+            "/tmp/work/summary/quality/unit/tools/windows.xml" \
+            -o \
+            "/tmp/work/summary/sdl/tools/CT40-SecurityValidation/windows.csv" \
+            -i Double Null Unsupported Invalid
           fi
 
       - name: Upload Summary

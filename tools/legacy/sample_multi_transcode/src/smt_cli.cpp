@@ -849,6 +849,11 @@ void PrintHelp() {
     HELP_LINE("");
     HELP_LINE("  -rdrm        use libva DRM backend");
 #endif
+#if defined(LIBVA_GTK4_SUPPORT)
+    HELP_LINE("");
+    HELP_LINE("  -rgtk        use GTK renderer");
+    HELP_LINE("  -fullscreen  render in fullscreen");
+#endif
     HELP_LINE("");
     HELP_LINE("  -syncop_timeout");
     HELP_LINE("                SyncOperation timeout in milliseconds");
@@ -887,8 +892,8 @@ void PrintHelp() {
 
     HELP_LINE("");
     HELP_LINE("ParFile format:");
-    HELP_LINE("  ParFile is extension of what can be achieved by setting pipeline in the command");
-    HELP_LINE("  line. For more information on ParFile format see readme-multi-transcode.pdf");
+    HELP_LINE("  A ParFile is a text file containing several command lines, each corresponding");
+    HELP_LINE("  to a single transcoding, decoding or encoding session.");
     HELP_LINE("");
     HELP_LINE("Examples:");
     HELP_LINE("  sample_multi_transcode -i::mpeg2 in.mpeg2 -o::h264 out.h264");
@@ -2871,6 +2876,15 @@ mfxStatus CmdProcessor::ParseParamsForOneSession(mfxU32 argc, char* argv[]) {
             else {
                 InputParams.monitorType = MFX_MONITOR_AUTO; // that's case of "-rdrm" pure option
             }
+        }
+#endif
+
+#if defined(LIBVA_GTK4_SUPPORT)
+        else if (msdk_starts_with(argv[i], "-rgtk")) {
+            InputParams.libvaBackend = MFX_LIBVA_GTK;
+        }
+        else if (msdk_match(argv[i], "-fullscreen")) {
+            InputParams.bIsFullscreen = true;
         }
 #endif
         else if (msdk_match(argv[i], "-vpp::sys")) {
