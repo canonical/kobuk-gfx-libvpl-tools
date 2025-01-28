@@ -1,26 +1,24 @@
 Source: libvpl-tools
 Section: graphics
 Priority: optional
-Maintainer: Shane McKee <shane.mckee@canonical.com>
-XSBC-Original-Maintainer: Intel Graphics Team <linux-graphics@intel.com>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Timo Aaltonen <tjaalton@debian.org>
 Build-Depends: debhelper-compat (= 13),
- build-essential,
  cmake,
+ pkgconf,
  libdrm-dev,
- libpciaccess-dev,
  libva-dev (>= 2.22),
  libvpl-dev (>= 2.14.0),
- libwayland-dev,
  libx11-dev,
  libx11-xcb-dev,
- libxcb-dri3-dev,
  libxcb-present-dev,
- pkg-config,
+ libxcb-dri3-dev,
+ libwayland-dev,
  wayland-protocols,
-Standards-Version: 4.6.0
+Standards-Version: 4.7.0
 Homepage: https://github.com/intel/libvpl-tools
-Vcs-Browser: https://github.com/intel/libvpl-tools
-Vcs-Git: https://github.com/intel/libvpl-tools.git
+Vcs-Browser: https://salsa.debian.org/debian/libvpl-tools
+Vcs-Git: https://salsa.debian.org/debian/libvpl-tools.git
 Rules-Requires-Root: no
 
 Package: libvpl-tools
@@ -28,7 +26,13 @@ Architecture: amd64
 Depends:
  libvpl2 (>= 2.14.0),
  ${shlibs:Depends}, ${misc:Depends}
-Description: Intel oneVPL GPU Runtime -- shared library
- Intel® Video Processing Library (Intel® VPL) tools provide access to hardware
- accelerated video decode, encode, and processing capabilities on Intel® GPUs
- from the command line.
+Conflicts: onevpl-tools
+Provides: onevpl-tools
+Replaces: onevpl-tools
+Description: Intel Video Processing Library -- command line tools
+ Intel Video Processing Library (Intel VPL) provides access to hardware
+ accelerated video decode, encode, and processing capabilities on Intel
+ GPUs to support AI visual inference, media delivery, cloud gaming, and virtual
+ desktop infrastructure use cases.
+ .
+ This package includes the command line tools.

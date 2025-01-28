@@ -1,12 +1,19 @@
 #!/usr/bin/make -f
-# See debhelper(7) (uncomment to enable)
-# output every command that modifies files on the build system.
 
 %:
-	dh $@
+	dh $@ --builddir build/
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DBUILD_DEV=ON
+		-DCMAKE_BUILD_TYPE=release \
+		-DVPL_INSTALL_ENVDIR=/usr/share/vpl/env \
+		-DVPL_INSTALL_MODFILEDIR=/usr/share/vpl/modulefiles
 
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/tmp
+	# clean redundant license files
+	rm -rf debian/tmp/usr/share/vpl-tools/licensing
+
+override_dh_clean:
+	rm -rf _build
+	dh_clean
