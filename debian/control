@@ -15,6 +15,7 @@ Build-Depends: debhelper-compat (= 13),
  libxcb-dri3-dev,
  libwayland-dev,
  wayland-protocols,
+ libgtkmm-4.0-dev,
 Standards-Version: 4.7.0
 Homepage: https://github.com/intel/libvpl-tools
 Vcs-Browser: https://salsa.debian.org/debian/libvpl-tools
