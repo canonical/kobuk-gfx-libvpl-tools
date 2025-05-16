@@ -19,9 +19,13 @@
 #include <stdio.h>
 
 #include <algorithm>
+#include <list>
+#include <map>
+#include <sstream>
 #include <string>
 
 #include "vpl/mfx.h"
+#include "vpl/mfxcamera.h"
 
 #define DECODE_FOURCC(ch) ch & 0xff, ch >> 8 & 0xff, ch >> 16 & 0xff, ch >> 24 & 0xff
 
@@ -114,22 +118,6 @@ const char *_print_MediaAdapterType(mfxMediaAdapterType type) {
 }
 
 #ifdef ONEVPL_EXPERIMENTAL
-const char *_print_EncodeStatsType(mfxU16 type) {
-    switch (type) {
-        STRING_OPTION(MFX_ENCODESTATS_LEVEL_BLK);
-        STRING_OPTION(MFX_ENCODESTATS_LEVEL_SLICE);
-        STRING_OPTION(MFX_ENCODESTATS_LEVEL_TILE);
-        STRING_OPTION(MFX_ENCODESTATS_LEVEL_FRAME);
-
-        default:
-            break;
-    }
-
-    return "<unknown encode stats type>";
-}
-#endif
-
-#ifdef ONEVPL_EXPERIMENTAL
 const char *_print_SurfaceType(mfxSurfaceType type) {
     switch (type) {
         STRING_OPTION(MFX_SURFACE_TYPE_UNKNOWN);
@@ -192,6 +180,172 @@ const char *_print_ResourceType(mfxResourceType type) {
     }
 
     return "<unknown resource type>";
+}
+
+const char *_print_CodecID(mfxU32 codecID) {
+    switch (codecID) {
+        STRING_OPTION(MFX_CODEC_AV1);
+        STRING_OPTION(MFX_CODEC_AVC);
+        STRING_OPTION(MFX_CODEC_JPEG);
+        STRING_OPTION(MFX_CODEC_HEVC);
+        STRING_OPTION(MFX_CODEC_MPEG2);
+        STRING_OPTION(MFX_CODEC_VC1);
+        STRING_OPTION(MFX_CODEC_VP8);
+        STRING_OPTION(MFX_CODEC_VP9);
+        default:
+            break;
+    }
+
+    // unknown format - print fourCC
+    return _print_fourcc(codecID);
+}
+
+const char *_print_ExtbufID(mfxU32 extbufID) {
+    switch (extbufID) {
+        STRING_OPTION(MFX_EXTBUFF_ALLOCATION_HINTS);
+        STRING_OPTION(MFX_EXTBUFF_AV1_FILM_GRAIN_PARAM);
+        STRING_OPTION(MFX_EXTBUFF_AV1_SEGMENTATION);
+        STRING_OPTION(MFX_EXTBUFF_AVC_REFLIST_CTRL);
+        STRING_OPTION(MFX_EXTBUFF_AVC_REFLISTS);
+        STRING_OPTION(MFX_EXTBUFF_AVC_ROUNDING_OFFSET);
+        STRING_OPTION(MFX_EXTBUFF_AVC_TEMPORAL_LAYERS);
+        STRING_OPTION(MFX_EXTBUFF_BRC);
+        STRING_OPTION(MFX_EXTBUF_CAM_3DLUT);
+        STRING_OPTION(MFX_EXTBUF_CAM_BAYER_DENOISE);
+        STRING_OPTION(MFX_EXTBUF_CAM_BLACK_LEVEL_CORRECTION);
+        STRING_OPTION(MFX_EXTBUF_CAM_COLOR_CORRECTION_3X3);
+        STRING_OPTION(MFX_EXTBUF_CAM_CSC_YUV_RGB);
+        STRING_OPTION(MFX_EXTBUF_CAM_FORWARD_GAMMA_CORRECTION);
+        STRING_OPTION(MFX_EXTBUF_CAM_HOT_PIXEL_REMOVAL);
+        STRING_OPTION(MFX_EXTBUF_CAM_LENS_GEOM_DIST_CORRECTION);
+        STRING_OPTION(MFX_EXTBUF_CAM_PADDING);
+        STRING_OPTION(MFX_EXTBUF_CAM_PIPECONTROL);
+        STRING_OPTION(MFX_EXTBUF_CAM_TOTAL_COLOR_CONTROL);
+        STRING_OPTION(MFX_EXTBUF_CAM_VIGNETTE_CORRECTION);
+        STRING_OPTION(MFX_EXTBUF_CAM_WHITE_BALANCE);
+        STRING_OPTION(MFX_EXTBUFF_CENC_PARAM);
+        STRING_OPTION(MFX_EXTBUFF_CHROMA_LOC_INFO);
+        STRING_OPTION(MFX_EXTBUFF_CODING_OPTION);
+        STRING_OPTION(MFX_EXTBUFF_CODING_OPTION_SPSPPS);
+        STRING_OPTION(MFX_EXTBUFF_CODING_OPTION_VPS);
+        STRING_OPTION(MFX_EXTBUFF_CODING_OPTION2);
+        STRING_OPTION(MFX_EXTBUFF_CODING_OPTION3);
+        STRING_OPTION(MFX_EXTBUFF_CONTENT_LIGHT_LEVEL_INFO);
+        STRING_OPTION(MFX_EXTBUFF_CROPS);
+        STRING_OPTION(MFX_EXTBUFF_DEC_VIDEO_PROCESSING);
+        STRING_OPTION(MFX_EXTBUFF_DECODE_ERROR_REPORT);
+        STRING_OPTION(MFX_EXTBUFF_DECODED_FRAME_INFO);
+        STRING_OPTION(MFX_EXTBUFF_DEVICE_AFFINITY_MASK);
+        STRING_OPTION(MFX_EXTBUFF_DIRTY_RECTANGLES);
+        STRING_OPTION(MFX_EXTBUFF_ENCODED_FRAME_INFO);
+        STRING_OPTION(MFX_EXTBUFF_ENCODED_SLICES_INFO);
+        STRING_OPTION(MFX_EXTBUFF_ENCODED_UNITS_INFO);
+        STRING_OPTION(MFX_EXTBUFF_ENCODER_CAPABILITY);
+        STRING_OPTION(MFX_EXTBUFF_ENCODER_IPCM_AREA);
+        STRING_OPTION(MFX_EXTBUFF_ENCODER_RESET_OPTION);
+        STRING_OPTION(MFX_EXTBUFF_ENCODER_ROI);
+        STRING_OPTION(MFX_EXTBUFF_HEVC_PARAM);
+        STRING_OPTION(MFX_EXTBUFF_HEVC_REGION);
+        STRING_OPTION(MFX_EXTBUFF_HEVC_TILES);
+        STRING_OPTION(MFX_EXTBUFF_INSERT_HEADERS);
+        STRING_OPTION(MFX_EXTBUFF_JPEG_HUFFMAN);
+        STRING_OPTION(MFX_EXTBUFF_JPEG_QT);
+        STRING_OPTION(MFX_EXTBUFF_MASTERING_DISPLAY_COLOUR_VOLUME);
+        STRING_OPTION(MFX_EXTBUFF_MASTERING_DISPLAY_COLOUR_VOLUME_IN);
+        STRING_OPTION(MFX_EXTBUFF_MASTERING_DISPLAY_COLOUR_VOLUME_OUT);
+        STRING_OPTION(MFX_EXTBUFF_MB_DISABLE_SKIP_MAP);
+        STRING_OPTION(MFX_EXTBUFF_MB_FORCE_INTRA);
+        STRING_OPTION(MFX_EXTBUFF_MBQP);
+        STRING_OPTION(MFX_EXTBUFF_MOVING_RECTANGLES);
+        STRING_OPTION(MFX_EXTBUFF_MV_OVER_PIC_BOUNDARIES);
+        STRING_OPTION(MFX_EXTBUFF_MVC_SEQ_DESC);
+        STRING_OPTION(MFX_EXTBUFF_MVC_TARGET_VIEWS);
+        STRING_OPTION(MFX_EXTBUFF_PARTIAL_BITSTREAM_PARAM);
+        STRING_OPTION(MFX_EXTBUFF_PICTURE_TIMING_SEI);
+        STRING_OPTION(MFX_EXTBUFF_PRED_WEIGHT_TABLE);
+        STRING_OPTION(MFX_EXTBUFF_THREADS_PARAM);
+        STRING_OPTION(MFX_EXTBUFF_TIME_CODE);
+        STRING_OPTION(MFX_EXTBUFF_UNIVERSAL_TEMPORAL_LAYERS);
+        STRING_OPTION(MFX_EXTBUFF_VIDEO_SIGNAL_INFO);
+        STRING_OPTION(MFX_EXTBUFF_VIDEO_SIGNAL_INFO_IN);
+        STRING_OPTION(MFX_EXTBUFF_VIDEO_SIGNAL_INFO_OUT);
+        STRING_OPTION(MFX_EXTBUFF_VP8_CODING_OPTION);
+        STRING_OPTION(MFX_EXTBUFF_VP9_PARAM);
+        STRING_OPTION(MFX_EXTBUFF_VP9_SEGMENTATION);
+        STRING_OPTION(MFX_EXTBUFF_VP9_TEMPORAL_LAYERS);
+        STRING_OPTION(MFX_EXTBUFF_VPP_3DLUT);
+        STRING_OPTION(MFX_EXTBUFF_VPP_AUXDATA);
+        STRING_OPTION(MFX_EXTBUFF_VPP_COLOR_CONVERSION);
+        STRING_OPTION(MFX_EXTBUFF_VPP_COLORFILL);
+        STRING_OPTION(MFX_EXTBUFF_VPP_COMPOSITE);
+        STRING_OPTION(MFX_EXTBUFF_VPP_DEINTERLACING);
+        STRING_OPTION(MFX_EXTBUFF_VPP_DENOISE2);
+        STRING_OPTION(MFX_EXTBUFF_VPP_DETAIL);
+        STRING_OPTION(MFX_EXTBUFF_VPP_DONOTUSE);
+        STRING_OPTION(MFX_EXTBUFF_VPP_DOUSE);
+        STRING_OPTION(MFX_EXTBUFF_VPP_FIELD_PROCESSING);
+        STRING_OPTION(MFX_EXTBUFF_VPP_FRAME_RATE_CONVERSION);
+        STRING_OPTION(MFX_EXTBUFF_VPP_IMAGE_STABILIZATION);
+        STRING_OPTION(MFX_EXTBUFF_VPP_MCTF);
+        STRING_OPTION(MFX_EXTBUFF_VPP_MIRRORING);
+        STRING_OPTION(MFX_EXTBUFF_VPP_PROCAMP);
+        STRING_OPTION(MFX_EXTBUFF_VPP_ROTATION);
+        STRING_OPTION(MFX_EXTBUFF_VPP_SCALING);
+        STRING_OPTION(MFX_EXTBUFF_VPP_SCENE_ANALYSIS);
+        STRING_OPTION(MFX_EXTBUFF_VPP_VIDEO_SIGNAL_INFO);
+#ifdef ONEVPL_EXPERIMENTAL
+        STRING_OPTION(MFX_EXTBUFF_ENCODESTATS);
+        STRING_OPTION(MFX_EXTBUFF_TUNE_ENCODE_QUALITY);
+        STRING_OPTION(MFX_EXTBUFF_VPP_PERC_ENC_PREFILTER);
+#endif
+        default:
+            break;
+    }
+
+    // unknown format - print fourCC
+    return _print_fourcc(extbufID);
+}
+
+const char *_print_ColorFormat(mfxU32 colorFormat) {
+    switch (colorFormat) {
+        STRING_OPTION(MFX_FOURCC_A2RGB10);
+        STRING_OPTION(MFX_FOURCC_ABGR16);
+        STRING_OPTION(MFX_FOURCC_ABGR16F);
+        STRING_OPTION(MFX_FOURCC_ARGB16);
+        STRING_OPTION(MFX_FOURCC_AYUV);
+        STRING_OPTION(MFX_FOURCC_AYUV_RGB4);
+        STRING_OPTION(MFX_FOURCC_BGR4);
+        STRING_OPTION(MFX_FOURCC_BGRP);
+        STRING_OPTION(MFX_FOURCC_I010);
+        STRING_OPTION(MFX_FOURCC_I210);
+        STRING_OPTION(MFX_FOURCC_I422);
+        STRING_OPTION(MFX_FOURCC_IYUV);
+        STRING_OPTION(MFX_FOURCC_NV12);
+        STRING_OPTION(MFX_FOURCC_NV16);
+        STRING_OPTION(MFX_FOURCC_NV21);
+        STRING_OPTION(MFX_FOURCC_P010);
+        STRING_OPTION(MFX_FOURCC_P016);
+        STRING_OPTION(MFX_FOURCC_P210);
+        STRING_OPTION(MFX_FOURCC_P8);
+        STRING_OPTION(MFX_FOURCC_P8_TEXTURE);
+        STRING_OPTION(MFX_FOURCC_R16);
+        STRING_OPTION(MFX_FOURCC_RGB4);
+        STRING_OPTION(MFX_FOURCC_RGB565);
+        STRING_OPTION(MFX_FOURCC_RGBP);
+        STRING_OPTION(MFX_FOURCC_UYVY);
+        STRING_OPTION(MFX_FOURCC_XYUV);
+        STRING_OPTION(MFX_FOURCC_Y210);
+        STRING_OPTION(MFX_FOURCC_Y216);
+        STRING_OPTION(MFX_FOURCC_Y410);
+        STRING_OPTION(MFX_FOURCC_Y416);
+        STRING_OPTION(MFX_FOURCC_YUY2);
+        STRING_OPTION(MFX_FOURCC_YV12);
+        default:
+            break;
+    }
+
+    // unknown format - print fourCC
+    return _print_fourcc(colorFormat);
 }
 
 const char *_print_ProfileType(mfxU32 fourcc, mfxU32 type) {
@@ -310,6 +464,63 @@ const char *_print_ProfileType(mfxU32 fourcc, mfxU32 type) {
 }
 
 // clang-format off
+
+#ifdef ONEVPL_EXPERIMENTAL
+typedef struct {
+    mfxU32 propData;
+    mfxU8 *propStr;
+} ConfigPropInfo;
+
+static const std::map<std::string, ConfigPropInfo> ConfigPropMap = {
+    { "basic:all", { 0, (mfxU8 *)"mfxImplDescription" } },  // no codec/vpp info, just query minimal (basic) info from mfxImplDescription
+
+    { "dec:all",   { 0, (mfxU8 *)"mfxImplDescription.mfxDecoderDescription" } },
+    { "enc:all",   { 0, (mfxU8 *)"mfxImplDescription.mfxEncoderDescription" } },
+    { "vpp:all",   { 0, (mfxU8 *)"mfxImplDescription.mfxVPPDescription"     } },
+
+    { "dec:av1",   { MFX_CODEC_AV1,   (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:avc",   { MFX_CODEC_AVC,   (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:hevc",  { MFX_CODEC_HEVC,  (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:mpeg2", { MFX_CODEC_MPEG2, (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:vc1",   { MFX_CODEC_VC1,   (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:vp8",   { MFX_CODEC_VP8,   (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:vp9",   { MFX_CODEC_VP9,   (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+    { "dec:vvc",   { MFX_CODEC_VVC,   (mfxU8 *)"mfxImplDescription.mfxDecoderDescription.decoder.CodecID" } },
+
+    { "enc:av1",   { MFX_CODEC_AV1,   (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:avc",   { MFX_CODEC_AVC,   (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:hevc",  { MFX_CODEC_HEVC,  (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:mpeg2", { MFX_CODEC_MPEG2, (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:vc1",   { MFX_CODEC_VC1,   (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:vp8",   { MFX_CODEC_VP8,   (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:vp9",   { MFX_CODEC_VP9,   (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+    { "enc:vvc",   { MFX_CODEC_VVC,   (mfxU8 *)"mfxImplDescription.mfxEncoderDescription.encoder.CodecID" } },
+
+    { "vpp:3dlut", { MFX_EXTBUFF_VPP_3DLUT,                  (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:aifrc", { MFX_EXTBUFF_VPP_AI_FRAME_INTERPOLATION, (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:aisr",  { MFX_EXTBUFF_VPP_AI_SUPER_RESOLUTION,    (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:auxd",  { MFX_EXTBUFF_VPP_AUXDATA,                (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:csc",   { MFX_EXTBUFF_VPP_COLOR_CONVERSION,       (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:cfill", { MFX_EXTBUFF_VPP_COLORFILL,              (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:comp",  { MFX_EXTBUFF_VPP_COMPOSITE,              (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:deint", { MFX_EXTBUFF_VPP_DEINTERLACING,          (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:dns2",  { MFX_EXTBUFF_VPP_DENOISE2,               (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:det",   { MFX_EXTBUFF_VPP_DETAIL,                 (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:douse", { MFX_EXTBUFF_VPP_DOUSE,                  (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:fproc", { MFX_EXTBUFF_VPP_FIELD_PROCESSING,       (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:frc",   { MFX_EXTBUFF_VPP_FRAME_RATE_CONVERSION,  (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:imgst", { MFX_EXTBUFF_VPP_IMAGE_STABILIZATION,    (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:mctf",  { MFX_EXTBUFF_VPP_MCTF,                   (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:mirr",  { MFX_EXTBUFF_VPP_MIRRORING,              (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:perc",  { MFX_EXTBUFF_VPP_PERC_ENC_PREFILTER,     (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:proc",  { MFX_EXTBUFF_VPP_PROCAMP,                (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:rot",   { MFX_EXTBUFF_VPP_ROTATION,               (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:scale", { MFX_EXTBUFF_VPP_SCALING,                (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:scnan", { MFX_EXTBUFF_VPP_SCENE_ANALYSIS,         (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+    { "vpp:vsig",  { MFX_EXTBUFF_VPP_VIDEO_SIGNAL_INFO,      (mfxU8 *)"mfxImplDescription.mfxVPPDescription.filter.FilterFourCC" } },
+};
+#endif
+
 static void Usage(void) {
     printf("\nUsage: vpl-inspect [options]\n");
     printf("\nIf no options are specified, print default capabilities report (MFX_IMPLCAPS_IMPLDESCSTRUCTURE)\n");
@@ -319,6 +530,10 @@ static void Usage(void) {
     printf("   -ex ............ print extended device ID info (MFX_IMPLCAPS_DEVICE_ID_EXTENDED)\n");
     printf("   -f ............. print list of implemented functions (MFX_IMPLCAPS_IMPLEMENTEDFUNCTIONS)\n");
     printf("   -d3d9 .......... only enumerate implementations supporting D3D9\n");
+#ifdef ONEVPL_EXPERIMENTAL
+    printf("   -props ......... list of props as KV pairs, separated with commas (ex: -props dec:all,enc:av1)\n");
+    printf("                    use '-props list' to print list of available properties\n");
+#endif
 #if defined(_WIN32) || defined(_WIN64)
     printf("   -disp .......... print path to loaded dispatcher library\n");
 #endif
@@ -337,8 +552,10 @@ int main(int argc, char *argv[]) {
     bool bRequireD3D9               = false;
     bool bPrintExtendedDeviceID     = false;
     bool bPrintDispInfo             = false;
+    bool bPropsQuery                = false;
 #ifdef ONEVPL_EXPERIMENTAL
     bool bPrintSurfaceTypes = true;
+    std::list<std::string> propStrList;
 #endif
 
     for (int argIdx = 1; argIdx < argc; argIdx++) {
@@ -356,6 +573,33 @@ int main(int argc, char *argv[]) {
         else if (nextArg == "-d3d9") {
             bRequireD3D9 = true;
         }
+#ifdef ONEVPL_EXPERIMENTAL
+        else if (nextArg == "-props") {
+            bPropsQuery        = true;
+            bPrintSurfaceTypes = false;
+            std::string propStr;
+            if (++argIdx < argc) {
+                propStr = argv[argIdx];
+
+                std::string s;
+                std::stringstream propSS(propStr);
+                while (getline(propSS, s, ',')) {
+                    propStrList.push_back(s);
+                }
+            }
+            else {
+                printf("Error - must specify which props\n");
+                return -1;
+            }
+
+            if (propStrList.front() == "list") {
+                printf("Available props arguments:\n");
+                for (auto const &it : ConfigPropMap)
+                    printf("  %s\n", it.first.c_str());
+                return 0;
+            }
+        }
+#endif
         else if (nextArg == "-?" || nextArg == "-help") {
             Usage();
             return -1;
@@ -416,6 +660,36 @@ int main(int argc, char *argv[]) {
             return -1;
         }
     }
+
+#ifdef ONEVPL_EXPERIMENTAL
+    if (bPropsQuery) {
+        mfxStatus sts;
+        mfxVariant var      = {};
+        var.Version.Version = MFX_VARIANT_VERSION;
+
+        for (const std::string &propStr : propStrList) {
+            mfxConfig cfg = MFXCreateConfig(
+                loader); // create new config for every property, for e.g. multiple codecs
+
+            auto it = ConfigPropMap.find(propStr);
+            if (it == ConfigPropMap.end()) {
+                printf("Error - invalid property string %s\n", propStr.c_str());
+                printf("run 'vplinspect -props list' for list of supported properties\n");
+                return -1;
+            }
+
+            // add property with MFX_VARIANT_TYPE_QUERY
+            var.Type = static_cast<mfxVariantType>(MFX_VARIANT_TYPE_U32 | MFX_VARIANT_TYPE_QUERY);
+            var.Data.U32 = it->second.propData;
+            sts          = MFXSetConfigFilterProperty(cfg, it->second.propStr, var);
+
+            if (sts) {
+                printf("Error - MFXSetConfigFilterProperty() returned %d\n", sts);
+                return -1;
+            }
+        }
+    }
+#endif
 
     int i = 0;
     mfxImplDescription *idesc;
@@ -480,13 +754,13 @@ int main(int argc, char *argv[]) {
             printf("%4sSubDeviceID: %s\n", "", dev->SubDevices[subdevice].SubDeviceID);
         }
 
-        if (bFullInfo) {
+        if (bFullInfo || bPropsQuery) {
             /* mfxDecoderDescription */
             mfxDecoderDescription *dec = &idesc->Dec;
             printf("%2smfxDecoderDescription:\n", "");
             printf("%4sVersion: %hu.%hu\n", "", dec->Version.Major, dec->Version.Minor);
             for (int codec = 0; codec < dec->NumCodecs; codec++) {
-                printf("%4sCodecID: %c%c%c%c\n", "", DECODE_FOURCC(dec->Codecs[codec].CodecID));
+                printf("%4sCodecID: %s\n", "", _print_CodecID(dec->Codecs[codec].CodecID));
                 printf("%4sMaxcodecLevel: %hu\n", "", dec->Codecs[codec].MaxcodecLevel);
                 for (int profile = 0; profile < dec->Codecs[codec].NumProfiles; profile++) {
                     printf("%6sProfile: %s\n",
@@ -528,10 +802,10 @@ int main(int argc, char *argv[]) {
                             if (0 != colorformat)
                                 printf(", ");
                             printf("%s",
-                                   _print_fourcc(dec->Codecs[codec]
-                                                     .Profiles[profile]
-                                                     .MemDesc[memtype]
-                                                     .ColorFormats[colorformat]));
+                                   _print_ColorFormat(dec->Codecs[codec]
+                                                          .Profiles[profile]
+                                                          .MemDesc[memtype]
+                                                          .ColorFormats[colorformat]));
                         }
                         printf("\n");
                     }
@@ -543,34 +817,12 @@ int main(int argc, char *argv[]) {
             printf("%2smfxEncoderDescription:\n", "");
             printf("%4sVersion: %hu.%hu\n", "", enc->Version.Major, enc->Version.Minor);
             for (int codec = 0; codec < enc->NumCodecs; codec++) {
-                printf("%4sCodecID: %c%c%c%c\n", "", DECODE_FOURCC(enc->Codecs[codec].CodecID));
+                printf("%4sCodecID: %s\n", "", _print_CodecID(enc->Codecs[codec].CodecID));
                 printf("%4sMaxcodecLevel: %hu\n", "", enc->Codecs[codec].MaxcodecLevel);
                 printf("%4sBiDirectionalPrediction: %hu\n",
                        "",
                        enc->Codecs[codec].BiDirectionalPrediction);
 
-#ifdef ONEVPL_EXPERIMENTAL
-                // Once ReportedStats is moved out of experimental API the struct version of mfxEncoderDescription should
-                //   be updated, and that can be used to know whether this field is valid.
-                // For now, just check implementation API version.
-                mfxVersion reqApiVersionReportedStats = {};
-                reqApiVersionReportedStats.Major      = 2;
-                reqApiVersionReportedStats.Minor      = 7;
-                if (idesc->ApiVersion.Version >= reqApiVersionReportedStats.Version) {
-                    mfxU16 reportedStats = enc->Codecs[codec].ReportedStats;
-                    if (reportedStats) {
-                        for (mfxU16 statMask = 1; statMask != 0; statMask <<= 1) {
-                            if (reportedStats & statMask) {
-                                const char *statStr = _print_EncodeStatsType(statMask);
-                                printf("%4sReportedStats: %s\n", "", statStr);
-                            }
-                        }
-                    }
-                    else {
-                        printf("%4sReportedStats: 0\n", "");
-                    }
-                }
-#endif
                 for (int profile = 0; profile < enc->Codecs[codec].NumProfiles; profile++) {
                     printf("%6sProfile: %s\n",
                            "",
@@ -611,10 +863,10 @@ int main(int argc, char *argv[]) {
                             if (0 != colorformat)
                                 printf(", ");
                             printf("%s",
-                                   _print_fourcc(enc->Codecs[codec]
-                                                     .Profiles[profile]
-                                                     .MemDesc[memtype]
-                                                     .ColorFormats[colorformat]));
+                                   _print_ColorFormat(enc->Codecs[codec]
+                                                          .Profiles[profile]
+                                                          .MemDesc[memtype]
+                                                          .ColorFormats[colorformat]));
                         }
                         printf("\n");
                     }
@@ -626,9 +878,9 @@ int main(int argc, char *argv[]) {
             printf("%2smfxVPPDescription:\n", "");
             printf("%4sVersion: %hu.%hu\n", "", vpp->Version.Major, vpp->Version.Minor);
             for (int filter = 0; filter < vpp->NumFilters; filter++) {
-                printf("%4sFilterFourCC: %c%c%c%c\n",
+                printf("%4sFilterFourCC: %s\n",
                        "",
-                       DECODE_FOURCC(vpp->Filters[filter].FilterFourCC));
+                       _print_ExtbufID(vpp->Filters[filter].FilterFourCC));
                 printf("%4sMaxDelayInFrames: %hu\n", "", vpp->Filters[filter].MaxDelayInFrames);
                 for (int memtype = 0; memtype < vpp->Filters[filter].NumMemTypes; memtype++) {
                     printf(
@@ -659,7 +911,7 @@ int main(int argc, char *argv[]) {
                         printf(
                             "%8sInFormat: %s\n",
                             "",
-                            _print_fourcc(
+                            _print_ColorFormat(
                                 vpp->Filters[filter].MemDesc[memtype].Formats[informat].InFormat));
                         printf("%10sOutFormats: ", "");
                         for (int outformat = 0;
@@ -669,10 +921,10 @@ int main(int argc, char *argv[]) {
                             if (0 != outformat)
                                 printf(", ");
                             printf("%s",
-                                   _print_fourcc(vpp->Filters[filter]
-                                                     .MemDesc[memtype]
-                                                     .Formats[informat]
-                                                     .OutFormats[outformat]));
+                                   _print_ColorFormat(vpp->Filters[filter]
+                                                          .MemDesc[memtype]
+                                                          .Formats[informat]
+                                                          .OutFormats[outformat]));
                         }
                         printf("\n");
                     }
